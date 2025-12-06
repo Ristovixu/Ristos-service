@@ -1,0 +1,28 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        # Основной путь к билд-файлу
+        root /usr/share/nginx/html;
+
+        # Настройка SPA (React/Vue) — перенаправление всех запросов на index.html
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        # Сжатие
+        gzip on;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml+rss image/svg+xml;
+    }
+}
