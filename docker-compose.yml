@@ -10,7 +10,7 @@ services:
         VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
     container_name: techremont-web
     ports:
-      - "8000:80"  # Порт 8000 для соответствия текущей конфигурации сервера
+      - "8000:80"  
     restart: unless-stopped
     environment:
       - NODE_ENV=production
