@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  MASTER
+}
+
+enum OrderStatus {
+  RECEIVED
+  DIAGNOSTICS
+  APPROVAL
+  IN_REPAIR
+  READY
+  ISSUED
+}
+
+enum NoteType {
+  PUBLIC
+  INTERNAL
+}
+
+enum EstimateType {
+  WORK
+  PART
+}
+
+enum DeliveryType {
+  COURIER
+  SELF_DROPOFF
+  IN_SHOP
+}
+
+model User {
+  id        String   @id @default(uuid())
+  login     String   @unique
+  password  String
+  name      String
+  role      Role     @default(MANAGER)
+  orders    Order[]  @relation("AssignedMaster")
+  notes     OrderNote[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id           String         @id @default(uuid())
+  orderNumber  String         @unique // e.g. TR-10294
+  clientName   String
+  clientPhone  String
+  deviceType   String
+  deviceModel  String?
+  problemDesc  String
+  deliveryMode DeliveryType   @default(SELF_DROPOFF)
+  status       OrderStatus    @default(RECEIVED)
+  masterId     String?
+  master       User?          @relation("AssignedMaster", fields: [masterId], references: [id])
+  notes        OrderNote[]
+  estimate     EstimateItem[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model OrderNote {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  text      String
+  type      NoteType @default(INTERNAL)
+  createdAt DateTime @default(now())
+}
+
+model EstimateItem {
+  id        String       @id @default(uuid())
+  orderId   String
+  order     Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  name      String
+  type      EstimateType @default(WORK)
+  qty       Int          @default(1)
+  price     Float
+  createdAt DateTime     @default(now())
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  category    String
+  name        String
+  time        String
+  priceFrom   Float
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Review {
+  id           String   @id @default(uuid())
+  author       String
+  text         String
+  rating       Int
+  deviceModel  String?
+  status       String   @default("PENDING") // PENDING, PUBLISHED, REJECTED
+  createdAt    DateTime @default(now())
+}
+
+model Page {
+  slug      String   @id
+  title     String
+  content   String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

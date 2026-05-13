@@ -1,8 +1,21 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: techremont-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: techrepair
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   web:
-    image: ${CI_REGISTRY_IMAGE}:latest 
+    image: ${CI_REGISTRY_IMAGE:-techremont}:latest 
     container_name: techremont-web
     ports:
       - "8000:80"  
@@ -16,3 +29,5 @@ services:
       retries: 3
       start_period: 40s
 
+volumes:
+  pgdata:

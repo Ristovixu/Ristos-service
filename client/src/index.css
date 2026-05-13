@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Основа (тёмная техно-тема) ── */
+    --c-bg:        #0C1421;
+    --c-surface:   #141E2E;
+    --c-surface-2: #1A2738;
+    --c-ink:       #E8ECF1;
+    --c-ink-soft:  #8B95A8;
+    --c-ink-ghost: #4A5568;
+
+    /* ── Акценты ── */
+    --c-accent:     #2D9CDB;   /* техно-синий — как ковры и инструменты */
+    --c-accent-hover:#3DB1F0;
+    --c-accent-alt: #D4943A;   /* медный/янтарный — как дорожки на платах */
+    --c-accent-glow: rgba(45, 156, 219, 0.15);
+
+    /* ── UI-утилиты ── */
+    --c-border:     rgba(255, 255, 255, 0.08);
+    --c-border-mid: rgba(255, 255, 255, 0.15);
+    --c-border-strong: rgba(255, 255, 255, 0.25);
+
+    /* ── Статусы ── */
+    --c-status-done:    #34D399;
+    --c-status-active:  #2D9CDB;
+    --c-status-pending: #64748B;
+
+    /* ── Типографика ── */
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+
+    /* ── Типографическая шкала ── */
+    --t-hero:  clamp(56px, 8vw, 96px);
+    --t-h1:    clamp(36px, 5vw, 60px);
+    --t-h2:    clamp(24px, 3vw, 36px);
+    --t-h3:    18px;
+    --t-body:  16px;
+    --t-small: 13px;
+    --t-mono:  13px;
+
+    /* ── Система отступов (кратно 8) ── */
+    --sp-1: 8px;   --sp-2: 16px;  --sp-3: 24px;  --sp-4: 32px;
+    --sp-6: 48px;  --sp-8: 64px;  --sp-12: 96px; --sp-20: 160px;
+  }
+
+  body {
+    background-color: var(--c-bg);
+    color: var(--c-ink);
+    font-family: var(--font-body);
+    font-weight: 300;
+    font-size: var(--t-body);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+    line-height: 1.0;
+    font-weight: 600;
+  }
+
+  ::selection {
+    background-color: var(--c-accent);
+    color: white;
+  }
+
+  /* Кастомный скроллбар под тёмную тему */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--c-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--c-border-mid);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--c-border-strong);
+  }
+}
+
+@layer components {
+  .section-padding {
+    padding-top: var(--sp-20);
+    padding-bottom: var(--sp-20);
+  }
+
+  @media (max-width: 768px) {
+    .section-padding {
+      padding-top: var(--sp-12);
+      padding-bottom: var(--sp-12);
+    }
+  }
+
+  .container-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+
+  @media (max-width: 1024px) {
+    .container-grid {
+      padding-left: 40px;
+      padding-right: 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container-grid {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--t-small);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--c-accent);
+  }
+
+  .text-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
