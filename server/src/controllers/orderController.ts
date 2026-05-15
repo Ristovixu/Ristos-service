@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { PrismaClient, OrderStatus, DeliveryType } from '@prisma/client';
 import { z } from 'zod';
+import jwt from 'jsonwebtoken';
+import { notificationService } from '../services/NotificationService';
 
 const prisma = new PrismaClient();
 
@@ -11,12 +13,29 @@ const createOrderSchema = z.object({
   name: z.string(),
   phone: z.string(),
   deliveryMode: z.enum(['COURIER', 'SELF_DROPOFF', 'IN_SHOP']).default('SELF_DROPOFF'),
+  messengerType: z.enum(['TELEGRAM', 'WHATSAPP', 'NONE']).optional().default('NONE'),
+  messengerContact: z.string().optional(),
+  clientId: z.string().optional(),
 });
 
-export const createOrder = async (req: Request, res: Response) => {
+export const createOrder = async (req: any, res: Response) => {
   try {
     const data = createOrderSchema.parse(req.body);
     const orderNumber = `TR-${Math.floor(10000 + Math.random() * 90000)}`;
+
+    // Get clientId if authenticated as CLIENT
+    let clientId = data.clientId || null; // Fallback to body clientId if provided
+    const token = req.cookies?.client_token || req.headers.authorization?.split(' ')[1];
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key') as any;
+        if (decoded.role === 'CLIENT') {
+          clientId = decoded.id;
+        }
+      } catch (e) {
+        // Token invalid, ignore
+      }
+    }
 
     const order = await prisma.order.create({
       data: {
@@ -26,10 +45,28 @@ export const createOrder = async (req: Request, res: Response) => {
         problemDesc: data.problemDesc,
         clientName: data.name,
         clientPhone: data.phone,
-        deliveryMode: data.deliveryMode as DeliveryType,
+        deliveryMode: data.deliveryMode,
         status: OrderStatus.RECEIVED,
+        messengerType: data.messengerType,
+        messengerContact: data.messengerContact,
+        clientId,
       },
     });
+
+    // Notify Admin about new order
+    notificationService.notifyAdminNewOrder(order).catch(err => console.error('Admin notification error:', err));
+
+    // Auto-save device for client if logged in
+    if (clientId) {
+      const existingDevice = await prisma.device.findFirst({
+        where: { clientId, type: data.deviceType, model: data.deviceModel }
+      });
+      if (!existingDevice) {
+        await prisma.device.create({
+          data: { clientId, type: data.deviceType, model: data.deviceModel }
+        });
+      }
+    }
 
     res.status(201).json({ success: true, orderNumber: order.orderNumber });
   } catch (error) {
@@ -91,6 +128,8 @@ export const updateOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status, masterId } = req.body;
     
+    const oldOrder = await prisma.order.findUnique({ where: { id: String(id) } });
+
     const order = await prisma.order.update({
       where: { id: String(id) },
       data: { 
@@ -98,6 +137,11 @@ export const updateOrder = async (req: Request, res: Response) => {
         masterId: masterId || undefined
       },
     });
+
+    if (oldOrder && oldOrder.status !== status) {
+      await notificationService.notifyStatusChange(order, status as OrderStatus);
+    }
+
     res.json({ success: true, order });
   } catch (error) {
     res.status(500).json({ success: false, error: 'Ошибка обновления заказа' });

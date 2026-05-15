@@ -1,7 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import { ordersRouter } from './routes/orders';
 import { authRouter } from './routes/auth';
 import { adminOrdersRouter } from './routes/adminOrders';
@@ -9,7 +11,8 @@ import { adminContentRouter } from './routes/adminContent';
 import { analyticsRouter } from './routes/analytics';
 import { adminUsersRouter } from './routes/adminUsers';
 
-dotenv.config();
+import { clientAuthRouter } from './routes/clientAuth';
+import { clientCabinetRouter } from './routes/clientCabinet';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,6 +31,8 @@ app.use('/api/admin/orders', adminOrdersRouter);
 app.use('/api/admin/content', adminContentRouter);
 app.use('/api/admin/analytics', analyticsRouter);
 app.use('/api/admin/users', adminUsersRouter);
+app.use('/api/client/auth', clientAuthRouter);
+app.use('/api/client/cabinet', clientCabinetRouter);
 
 // Basic health check
 app.get('/health', (req, res) => {

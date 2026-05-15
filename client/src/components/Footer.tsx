@@ -26,7 +26,8 @@ export const Footer = () => {
                 { name: 'Услуги и цены', path: '/services' },
                 { name: 'Статус заказа', path: '/status' },
                 { name: 'Оформить заявку', path: '/order' },
-                { name: 'Контакты', path: '/contacts' },
+                { name: 'Личный кабинет', path: '/cabinet' },
+                { name: 'Панель управления', path: '/admin' },
               ].map((link) => (
                 <li key={link.path}>
                   <Link

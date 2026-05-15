@@ -34,19 +34,41 @@ export const ServicesPage = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: ease.out }}
-      className="pt-32"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative"
     >
-      <div className="container-grid section-padding">
+      {/* Decorative Page Header Background */}
+      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[var(--c-accent)]/5 to-transparent -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[300px] bg-[radial-gradient(circle_at_top,var(--c-accent)_0%,transparent_70%)] opacity-[0.03] -z-10" />
+
+      <div className="container-grid pt-40 pb-20">
         {/* Header */}
         <div className="mb-16">
-          <p className="eyebrow mb-4">Каталог</p>
-          <h1 className="text-display mb-8" style={{ fontSize: 'var(--t-h1)' }}>Услуги и цены</h1>
-          <p className="text-[var(--c-ink-soft)] font-light text-lg max-w-xl leading-relaxed">
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="eyebrow mb-4"
+          >
+            Каталог
+          </motion.p>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-display mb-8" 
+            style={{ fontSize: 'var(--t-h1)' }}
+          >
+            Услуги и цены
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-[var(--c-ink-soft)] font-light text-lg max-w-xl leading-relaxed"
+          >
             Мы чиним практически любую технику. Все цены — ориентировочные, точная стоимость определяется после диагностики.
-          </p>
+          </motion.p>
         </div>
 
         {/* Filters */}
@@ -81,8 +103,7 @@ export const ServicesPage = () => {
         {/* Grid */}
         <motion.div
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={containerVariants}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[var(--c-border)]"
         >

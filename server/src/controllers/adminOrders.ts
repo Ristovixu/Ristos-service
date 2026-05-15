@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient, OrderStatus, DeliveryType, NoteType, EstimateType } from '@prisma/client';
+import { notificationService } from '../services/NotificationService';
 
 const prisma = new PrismaClient();
 
@@ -53,6 +54,7 @@ export const getOrders = async (req: Request, res: Response) => {
         orderBy: { [String(sortBy)]: sortOrder },
         include: {
           master: { select: { id: true, name: true } },
+          client: { select: { id: true, telegramId: true } },
           _count: { select: { notes: true } }
         }
       }),
@@ -79,6 +81,7 @@ export const getOrderById = async (req: Request, res: Response) => {
       where: { id: String(id) },
       include: {
         master: { select: { id: true, name: true, login: true, role: true } },
+        client: { select: { id: true, telegramId: true, createdAt: true } },
         notes: {
           include: { author: { select: { id: true, name: true } } },
           orderBy: { createdAt: 'desc' }
@@ -102,6 +105,8 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   const { status, masterId } = req.body;
 
   try {
+    const oldOrder = await prisma.order.findUnique({ where: { id: String(id) } });
+
     const updatedOrder = await prisma.order.update({
       where: { id: String(id) },
       data: { 
@@ -109,6 +114,10 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
         masterId: masterId !== undefined ? masterId : undefined
       }
     });
+
+    if (oldOrder && oldOrder.status !== status) {
+      await notificationService.notifyStatusChange(updatedOrder, status as OrderStatus);
+    }
     
     res.json({ success: true, order: updatedOrder });
   } catch (error) {

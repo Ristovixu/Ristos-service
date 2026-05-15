@@ -178,19 +178,33 @@ export const OrderDetailPage: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-1">
                 <label className="text-[10px] uppercase font-bold text-[#9CA3AF]">Имя клиента</label>
-                <input 
-                  value={clientData.clientName}
-                  onChange={e => { setClientData({...clientData, clientName: e.target.value}); setIsClientModified(true); }}
-                  className="w-full text-sm font-medium border-b border-transparent focus:border-[#C8390B] outline-none py-1 transition-all"
-                />
+                <div className="flex items-center gap-2">
+                  <input 
+                    value={clientData.clientName}
+                    onChange={e => { setClientData({...clientData, clientName: e.target.value}); setIsClientModified(true); }}
+                    className="flex-1 text-sm font-medium border-b border-transparent focus:border-[#C8390B] outline-none py-1 transition-all"
+                  />
+                  {order.client && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-green-50 text-[10px] font-bold text-green-600 rounded-lg border border-green-100">
+                      <CheckCircle2 className="w-3 h-3" /> Рег.
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] uppercase font-bold text-[#9CA3AF]">Телефон</label>
-                <input 
-                  value={clientData.clientPhone}
-                  onChange={e => { setClientData({...clientData, clientPhone: e.target.value}); setIsClientModified(true); }}
-                  className="w-full text-sm font-medium border-b border-transparent focus:border-[#C8390B] outline-none py-1 transition-all"
-                />
+                <div className="flex items-center gap-2">
+                  <input 
+                    value={clientData.clientPhone}
+                    onChange={e => { setClientData({...clientData, clientPhone: e.target.value}); setIsClientModified(true); }}
+                    className="flex-1 text-sm font-medium border-b border-transparent focus:border-[#C8390B] outline-none py-1 transition-all"
+                  />
+                  {order.client?.telegramId && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-[10px] font-bold text-blue-600 rounded-lg border border-blue-100" title="Клиент подключен к Telegram">
+                      <Send className="w-3 h-3" /> TG
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="mt-8 pt-8 border-t border-gray-50 grid grid-cols-2 md:grid-cols-4 gap-4">

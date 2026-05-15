@@ -45,11 +45,33 @@ export const OrderStatusPage = () => {
   const idx = getActiveStepIdx();
 
   return (
-    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: ease.out }} className="pt-32">
-      <div className="container-grid section-padding max-w-2xl mx-auto">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative"
+    >
+      {/* Decorative Page Header Background */}
+      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[var(--c-accent)]/5 to-transparent -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[300px] bg-[radial-gradient(circle_at_top,var(--c-accent)_0%,transparent_70%)] opacity-[0.03] -z-10" />
+
+      <div className="container-grid pt-40 pb-20 max-w-2xl mx-auto">
         <div className="mb-16">
-          <p className="eyebrow mb-4">Отслеживание</p>
-          <h1 className="text-display mb-6 font-semibold" style={{ fontSize: 'var(--t-h1)' }}>Статус заказа</h1>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="eyebrow mb-4 text-center"
+          >
+            Отслеживание
+          </motion.p>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-display mb-6 font-semibold text-center" 
+            style={{ fontSize: 'var(--t-h1)' }}
+          >
+            Статус заказа
+          </motion.h1>
         </div>
 
         {!currentStatus ? (

@@ -11,6 +11,7 @@ enum Role {
   ADMIN
   MANAGER
   MASTER
+  CLIENT
 }
 
 enum OrderStatus {
@@ -51,21 +52,81 @@ model User {
 }
 
 model Order {
-  id           String         @id @default(uuid())
-  orderNumber  String         @unique // e.g. TR-10294
-  clientName   String
-  clientPhone  String
-  deviceType   String
-  deviceModel  String?
-  problemDesc  String
-  deliveryMode DeliveryType   @default(SELF_DROPOFF)
-  status       OrderStatus    @default(RECEIVED)
-  masterId     String?
-  master       User?          @relation("AssignedMaster", fields: [masterId], references: [id])
-  notes        OrderNote[]
-  estimate     EstimateItem[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id               String         @id @default(uuid())
+  orderNumber      String         @unique // e.g. TR-10294
+  clientName       String
+  clientPhone      String
+  clientId         String?
+  client           Client?        @relation("ClientOrders", fields: [clientId], references: [id])
+  deviceType       String
+  deviceModel      String?
+  problemDesc      String
+  deliveryMode     DeliveryType   @default(SELF_DROPOFF)
+  status           OrderStatus    @default(RECEIVED)
+  masterId         String?
+  master           User?          @relation("AssignedMaster", fields: [masterId], references: [id])
+  notes            OrderNote[]
+  estimate         EstimateItem[]
+  messengerType    MessengerType  @default(NONE)
+  messengerContact String?
+  notifications    NotificationLog[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+enum MessengerType { 
+  TELEGRAM 
+  WHATSAPP 
+  NONE 
+}
+
+model NotificationLog {
+  id        String        @id @default(uuid())
+  order     Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  channel   MessengerType
+  status    String        // 'sent' | 'failed'
+  error     String?
+  sentAt    DateTime      @default(now())
+}
+
+model Client {
+  id         String   @id @default(uuid())
+  phone      String   @unique
+  name       String?
+  telegramId String?  @unique
+  devices    Device[]
+  orders     Order[]  @relation("ClientOrders")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  phone     String
+  code      String   // 4-значный код
+  expiresAt DateTime // now + 5 минут
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model TelegramSession {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  chatId    String?
+  status    String   @default("PENDING") // PENDING, AUTHORIZED, EXPIRED
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+model Device {
+  id         String   @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  type       String   // smartphone, laptop, appliance...
+  model      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model OrderNote {

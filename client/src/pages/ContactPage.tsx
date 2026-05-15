@@ -1,81 +1,93 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, MessageSquare } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 
-const ease = { out: [0.16, 1, 0.3, 1] as const };
-const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: ease.out } }
-};
-
-const contacts = [
-  { icon: <MapPin />, title: 'Адрес', value: 'г. Москва, ул. Техническая, 42', sub: 'Вход со стороны двора, 2 этаж' },
-  { icon: <Phone />, title: 'Телефон', value: '+7 (999) 123-45-67', sub: 'Ежедневно с 9:00 до 21:00' },
-  { icon: <Mail />, title: 'Почта', value: 'info@techrepair.ru', sub: 'Ответим в течение часа' },
-  { icon: <Clock />, title: 'Режим работы', value: 'Пн–Сб: 9:00 – 21:00', sub: 'Вс: 10:00 – 18:00' },
-];
-
-export const ContactPage = () => {
+export const ContactPage: React.FC = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: ease.out }}
-      className="pt-32"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative"
     >
-      {/* Facade image */}
-      <div className="container-grid section-padding pb-0">
-        <div className="h-[320px] md:h-[400px] overflow-hidden">
-          <img
-            src="/images/contact-facade.jpg"
-            alt="Фасад мастерской — вывеска, вход"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </div>
+      {/* Decorative Page Header Background */}
+      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[var(--c-accent)]/5 to-transparent -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[300px] bg-[radial-gradient(circle_at_top,var(--c-accent)_0%,transparent_70%)] opacity-[0.03] -z-10" />
 
-      <div className="container-grid section-padding">
-        <div className="grid md:grid-cols-12 gap-16">
-          <div className="md:col-span-5">
-            <p className="eyebrow mb-4">Контакты</p>
-            <h1 className="text-display mb-8" style={{ fontSize: 'var(--t-h1)' }}>
-              Свяжитесь с нами
-            </h1>
-            <p className="text-[var(--c-ink-soft)] font-light text-lg leading-relaxed">
-              Мы всегда на связи и готовы помочь с любой проблемой вашей техники.
-            </p>
+      <div className="container-grid pt-40 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-display text-5xl mb-12"
+          >
+            Контакты
+          </motion.h1>
+        
+        <div className="grid md:grid-cols-2 gap-12">
+          <div className="space-y-10">
+            <div className="flex gap-6">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--c-surface)] flex items-center justify-center flex-shrink-0 border border-[var(--c-border)]">
+                <MapPin className="w-6 h-6 text-[var(--c-accent)]" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl mb-2">Наш адрес</h3>
+                <p className="text-[var(--c-ink-soft)] font-light leading-relaxed">
+                  г. Москва, ул. Профсоюзная, д. 56<br />
+                  ТЦ «Черемушки», 2 этаж, пав. 24
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-6">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--c-surface)] flex items-center justify-center flex-shrink-0 border border-[var(--c-border)]">
+                <Phone className="w-6 h-6 text-[var(--c-accent)]" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl mb-2">Телефоны</h3>
+                <p className="text-[var(--c-ink-soft)] font-light leading-relaxed">
+                  +7 (495) 123-45-67<br />
+                  +7 (926) 000-00-00
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-6">
+              <div className="w-12 h-12 rounded-2xl bg-[var(--c-surface)] flex items-center justify-center flex-shrink-0 border border-[var(--c-border)]">
+                <Clock className="w-6 h-6 text-[var(--c-accent)]" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl mb-2">Режим работы</h3>
+                <p className="text-[var(--c-ink-soft)] font-light leading-relaxed">
+                  Ежедневно: 10:00 — 21:00<br />
+                  Без перерывов и выходных
+                </p>
+              </div>
+            </div>
           </div>
 
-          <motion.div
-            className="md:col-span-6 md:col-start-7"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-            variants={containerVariants}
-          >
-            <div className="divide-y divide-[var(--c-border)]">
-              {contacts.map((c, i) => (
-                <motion.div
-                  key={i}
-                  variants={itemVariants}
-                  className="py-8 flex gap-6 group"
-                >
-                  <div className="text-[var(--c-accent)] mt-1 shrink-0">
-                    {React.cloneElement(c.icon as React.ReactElement, { className: 'w-5 h-5', strokeWidth: 1.5 })}
-                  </div>
-                  <div>
-                    <p className="text-[var(--c-ink-ghost)] text-[11px] uppercase tracking-widest font-medium mb-2">{c.title}</p>
-                    <p className="text-[var(--c-ink)] font-display text-[20px] font-light mb-1">{c.value}</p>
-                    <p className="text-[var(--c-ink-soft)] text-[var(--t-small)] font-light">{c.sub}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          <div className="bg-[var(--c-surface)] p-8 md:p-10 rounded-3xl border border-[var(--c-border)]">
+            <h3 className="font-display text-2xl mb-6">Напишите нам</h3>
+            <form className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-[var(--c-ink-ghost)]">Ваше имя</label>
+                <input className="w-full bg-transparent border-b border-[var(--c-border)] py-2 outline-none focus:border-[var(--c-accent)] transition-colors" placeholder="Иван" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-[var(--c-ink-ghost)]">Телефон или Email</label>
+                <input className="w-full bg-transparent border-b border-[var(--c-border)] py-2 outline-none focus:border-[var(--c-accent)] transition-colors" placeholder="+7 (900) 000-00-00" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-[var(--c-ink-ghost)]">Сообщение</label>
+                <textarea className="w-full bg-transparent border-b border-[var(--c-border)] py-2 outline-none focus:border-[var(--c-accent)] transition-colors resize-none h-24" placeholder="Как мы можем вам помочь?" />
+              </div>
+              <Button variant="primary" className="w-full">Отправить сообщение</Button>
+            </form>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
+  </motion.div>
   );
 };
 

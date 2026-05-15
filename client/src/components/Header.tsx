@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Menu } from 'lucide-react';
+import { X, Menu, User as UserIcon } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 export const Header = () => {
+  const { isAuthenticated, client } = useSelector((state: RootState) => state.clientAuth);
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -64,7 +67,13 @@ export const Header = () => {
             ))}
           </nav>
 
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4">
+            <Link to={isAuthenticated ? "/cabinet" : "/cabinet/login"}>
+              <button className="flex items-center gap-2 px-4 py-2 text-[14px] font-medium text-[var(--c-ink-soft)] hover:text-[var(--c-ink)] transition-colors">
+                <UserIcon size={18} />
+                <span>{isAuthenticated ? 'Кабинет' : 'Войти'}</span>
+              </button>
+            </Link>
             <Link to="/order">
               <Button variant="primary" withArrow>Оставить заявку</Button>
             </Link>
@@ -98,7 +107,12 @@ export const Header = () => {
             </div>
 
             <nav className="flex-1 flex flex-col justify-center container-grid gap-8">
-              {[{ name: 'Главная', path: '/' }, ...navLinks, { name: 'Оставить заявку', path: '/order' }].map((link, i) => (
+              {[
+                { name: 'Главная', path: '/' },
+                ...navLinks,
+                { name: isAuthenticated ? 'Личный кабинет' : 'Войти', path: isAuthenticated ? '/cabinet' : '/cabinet/login' },
+                { name: 'Оставить заявку', path: '/order' }
+              ].map((link, i) => (
                 <motion.div
                   key={link.path}
                   initial={{ opacity: 0, x: 40 }}

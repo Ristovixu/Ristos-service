@@ -1,23 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Check } from 'lucide-react';
+import { Check, ShieldCheck } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store';
+import { setClient } from '../store/slices/clientAuthSlice';
 
 const ease = { out: [0.16, 1, 0.3, 1] as const };
 
 const steps = ['Устройство', 'Проблема', 'Контакты', 'Доставка'];
 
 export const WizardOrderPage = () => {
+  const { isAuthenticated, client, token } = useSelector((state: RootState) => state.clientAuth);
+  const dispatch = useDispatch();
   const [step, setStep] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
 
   const [formData, setFormData] = useState({
     deviceType: '', deviceModel: '', problemDesc: '',
-    name: '', phone: '', messenger: 'telegram', deliveryMode: 'dropoff',
+    name: '', phone: '', messengerType: 'NONE', messengerContact: '', deliveryMode: 'dropoff',
   });
+
+  // Pre-fill data if authenticated
+  useEffect(() => {
+    if (isAuthenticated && client) {
+      const isRealPhone = client.phone && !client.phone.startsWith('TG-');
+      setFormData(prev => ({
+        ...prev,
+        name: client.name || prev.name,
+        phone: isRealPhone ? client.phone : prev.phone,
+        messengerType: client.telegramId ? 'TELEGRAM' : prev.messengerType,
+        messengerContact: client.telegramId || prev.messengerContact
+      }));
+    }
+  }, [isAuthenticated, client]);
+
+  // Polling for real phone if missing
+  useEffect(() => {
+    let interval: any;
+    const hasRealPhone = client?.phone && !client.phone.startsWith('TG-');
+    
+    if (isAuthenticated && !hasRealPhone) {
+      interval = setInterval(async () => {
+        try {
+          const response = await fetch('http://localhost:5000/api/client/auth/me', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const result = await response.json();
+          if (result.success && result.client.phone && !result.client.phone.startsWith('TG-')) {
+            dispatch(setClient(result.client));
+            clearInterval(interval);
+          }
+        } catch (err) {
+          console.error('Polling error:', err);
+        }
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [isAuthenticated, client, token, dispatch]);
 
   const update = (field: string, value: string) => setFormData(prev => ({ ...prev, [field]: value }));
   const nextStep = () => setStep(prev => prev + 1);
@@ -25,15 +68,18 @@ export const WizardOrderPage = () => {
 
   const onSubmit = async () => {
     try {
-      // Маппинг значений доставки для бэкенда
       const mappedData = {
         ...formData,
-        deliveryMode: formData.deliveryMode === 'dropoff' ? 'SELF_DROPOFF' : 'COURIER'
+        deliveryMode: formData.deliveryMode === 'dropoff' ? 'SELF_DROPOFF' : 'COURIER',
+        clientId: client?.id
       };
       
       const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify(mappedData),
       });
       const result = await response.json();
@@ -76,24 +122,27 @@ export const WizardOrderPage = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: ease.out }}
-      className="pt-32"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="relative"
     >
-      <div className="container-grid section-padding max-w-2xl mx-auto">
-        {/* Step indicator */}
+      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-[var(--c-accent)]/5 to-transparent -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-[300px] bg-[radial-gradient(circle_at_top,var(--c-accent)_0%,transparent_70%)] opacity-[0.03] -z-10" />
+
+      <div className="container-grid pt-40 pb-20 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-16">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
             <p className="eyebrow mb-2">Оформление заявки</p>
             <h1 className="text-display" style={{ fontSize: 'var(--t-h2)' }}>{steps[step]}</h1>
-          </div>
+          </motion.div>
           <span className="font-mono text-[var(--c-ink-ghost)] text-[var(--t-mono)]">
             {String(step + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
           </span>
         </div>
 
-        {/* Progress line */}
         <div className="h-[1px] bg-[var(--c-border)] mb-12 relative">
           <motion.div
             className="absolute top-0 left-0 h-full bg-[var(--c-accent)]"
@@ -102,7 +151,6 @@ export const WizardOrderPage = () => {
           />
         </div>
 
-        {/* Step content */}
         <motion.div
           key={step}
           initial={{ opacity: 0, x: 20 }}
@@ -130,25 +178,56 @@ export const WizardOrderPage = () => {
           )}
           {step === 2 && (
             <>
+              {isAuthenticated && (
+                <div className="flex items-center gap-3 p-4 bg-[var(--c-accent)]/5 border border-[var(--c-accent)]/10 rounded-2xl mb-6">
+                  <div className="w-10 h-10 bg-[var(--c-accent)]/10 rounded-xl flex items-center justify-center text-[var(--c-accent)]">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--c-accent)]">Подтверждённый аккаунт</p>
+                    <p className="text-[11px] text-[var(--c-ink-soft)]">Ваши контакты заполнены автоматически</p>
+                  </div>
+                </div>
+              )}
               <Input label="Ваше имя" value={formData.name} onChange={(e) => update('name', e.target.value)} required />
               <Input label="Телефон" type="tel" value={formData.phone} onChange={(e) => update('phone', e.target.value)} required />
-              <div className="space-y-2">
-                <label className="text-[var(--c-ink-ghost)] text-[11px] uppercase tracking-widest font-medium">Предпочтительный способ связи</label>
+              
+              <div className="space-y-4">
+                <label className="text-[var(--c-ink-ghost)] text-[11px] uppercase tracking-widest font-bold">Где вам удобнее получать уведомления?</label>
                 <div className="flex gap-3">
-                  {['telegram', 'whatsapp', 'call'].map((m) => (
+                  {[
+                    { id: 'TELEGRAM', label: 'Telegram' },
+                    { id: 'WHATSAPP', label: 'WhatsApp' },
+                    { id: 'NONE', label: 'Только звонок' }
+                  ].map((m) => (
                     <button
-                      key={m}
-                      onClick={() => update('messenger', m)}
-                      className={`px-5 py-2.5 font-body text-[14px] border transition-all duration-300 ${
-                        formData.messenger === m
-                          ? 'bg-[var(--c-ink)] text-white border-[var(--c-ink)]'
+                      key={m.id}
+                      type="button"
+                      onClick={() => update('messengerType', m.id)}
+                      className={`px-6 py-3 rounded-xl border transition-all duration-300 font-medium ${
+                        formData.messengerType === m.id
+                          ? 'bg-[var(--c-accent)] text-white border-[var(--c-accent)]'
                           : 'text-[var(--c-ink-soft)] border-[var(--c-border)] hover:border-[var(--c-border-mid)]'
                       }`}
                     >
-                      {m === 'telegram' ? 'Telegram' : m === 'whatsapp' ? 'WhatsApp' : 'Звонок'}
+                      {m.label}
                     </button>
                   ))}
                 </div>
+                
+                {formData.messengerType !== 'NONE' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                  >
+                    <Input 
+                      label={formData.messengerType === 'TELEGRAM' ? 'Ваш @username' : 'Номер WhatsApp'} 
+                      value={formData.messengerContact} 
+                      onChange={(e) => update('messengerContact', e.target.value)} 
+                      required 
+                    />
+                  </motion.div>
+                )}
               </div>
             </>
           )}
@@ -178,7 +257,6 @@ export const WizardOrderPage = () => {
           )}
         </motion.div>
 
-        {/* Navigation */}
         <div className="flex justify-between mt-16 pt-8 border-t border-[var(--c-border)]">
           {step > 0 ? (
             <Button variant="ghost" onClick={prevStep}>← Назад</Button>

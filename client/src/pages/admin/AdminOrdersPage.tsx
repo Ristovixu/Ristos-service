@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, ChevronLeft, ChevronRight, Eye, MoreHorizontal, User as UserIcon } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, Eye, MoreHorizontal, User as UserIcon, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import adminApi from '../../api/adminApi';
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ interface Order {
   status: OrderStatus;
   createdAt: string;
   master: { name: string } | null;
+  client: { id: string, telegramId: string } | null;
 }
 
 const statusMap: Record<OrderStatus, { label: string; color: string }> = {
@@ -62,7 +63,10 @@ export const AdminOrdersPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, statusFilter]);
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchOrders, 30000);
+    return () => clearInterval(interval);
+  }, [currentPage, statusFilter, search]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,7 +148,14 @@ export const AdminOrdersPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-[#111827]">{order.clientName}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-[#111827]">{order.clientName}</span>
+                          {order.client?.telegramId && (
+                            <span className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-50 text-[9px] font-bold text-blue-600 rounded border border-blue-100">
+                              <Send className="w-2.5 h-2.5" /> TG
+                            </span>
+                          )}
+                        </div>
                         <span className="text-xs text-[#6B7280]">{order.clientPhone}</span>
                       </div>
                     </td>
