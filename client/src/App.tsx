@@ -49,13 +49,13 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const titles: Record<string, string> = {
-      '/': 'ТехРемонт Pro — Профессиональный сервис вашей техники',
-      '/services': 'Услуги и цены — ТехРемонт Pro',
-      '/order': 'Оформить заявку — ТехРемонт Pro',
-      '/status': 'Проверить статус заказа — ТехРемонт Pro',
-      '/admin': 'Вход в панель управления — ТехРемонт Pro',
+      '/': 'PixelFix — Профессиональный сервис вашей техники',
+      '/services': 'Услуги и цены — PixelFix',
+      '/order': 'Оформить заявку — PixelFix',
+      '/status': 'Проверить статус заказа — PixelFix',
+      '/admin': 'Вход в панель управления — PixelFix',
     };
-    document.title = titles[location.pathname] || 'ТехРемонт Pro';
+    document.title = titles[location.pathname] || 'PixelFix';
     
     // Скролл вверх при смене страницы
     window.scrollTo(0, 0);

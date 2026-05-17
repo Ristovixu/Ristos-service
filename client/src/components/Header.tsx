@@ -40,7 +40,7 @@ export const Header = () => {
         <div className="container-grid h-20 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <span className="font-display text-[22px] font-semibold text-[var(--c-ink)] tracking-tight">
-              TechRepair
+              PixelFix
             </span>
           </Link>
 
@@ -99,7 +99,7 @@ export const Header = () => {
           >
             <div className="container-grid h-20 flex items-center justify-between">
               <span className="font-display text-[22px] font-semibold text-[var(--c-ink)] tracking-tight">
-                TechRepair
+                PixelFix
               </span>
               <button onClick={() => setIsMobileOpen(false)} className="p-2 text-[var(--c-ink)]">
                 <X className="w-6 h-6" />

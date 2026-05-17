@@ -43,7 +43,7 @@ export const AdminLoginPage = () => {
     >
       <div className="w-full max-w-md">
         <div className="mb-12 text-center">
-          <span className="font-display text-[28px] font-semibold text-[var(--c-ink)]">TechRepair</span>
+          <span className="font-display text-[28px] font-semibold text-[var(--c-ink)]">PixelFix</span>
           <p className="text-[var(--c-ink-soft)] font-light mt-2">Панель управления</p>
         </div>
 

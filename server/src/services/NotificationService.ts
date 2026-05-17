@@ -116,7 +116,7 @@ class NotificationService {
     });
 
     this.telegramBot.onText(/\/start$/, (msg) => {
-      this.telegramBot?.sendMessage(msg.chat.id, 'Добро пожаловать в техподдержку ТехРемонт! 🛠\n\nЧтобы войти в личный кабинет на сайте, нажмите кнопку «Войти через Telegram» на странице входа.');
+      this.telegramBot?.sendMessage(msg.chat.id, 'Добро пожаловать в техподдержку PixelFix! 🛠\n\nЧтобы войти в личный кабинет на сайте, нажмите кнопку «Войти через Telegram» на странице входа.');
     });
   }
 
@@ -148,9 +148,12 @@ class NotificationService {
     try {
       let success = false;
       let error = '';
+      
+      // Try to resolve the best target Telegram ID
       let targetTelegramId = order.messengerContact;
+      let effectiveChannel = channel;
 
-      // If linked to a client, try to get their real telegramId (chatId)
+      // 1. If we have a clientId, try to get the linked telegramId
       if (order.clientId) {
         const client = await prisma.client.findUnique({
           where: { id: order.clientId },
@@ -158,12 +161,26 @@ class NotificationService {
         });
         if (client?.telegramId) {
           targetTelegramId = client.telegramId;
+          // If the order was NONE but we have a linked TG, use it
+          if (effectiveChannel === 'NONE') effectiveChannel = 'TELEGRAM';
         }
       }
 
-      if (channel === 'TELEGRAM' && targetTelegramId && /^\d+$/.test(targetTelegramId)) {
+      // 2. If still no valid chatId or channel is NONE, try searching by phone
+      if ((!targetTelegramId || !/^\d+$/.test(targetTelegramId)) || effectiveChannel === 'NONE') {
+        const clientByPhone = await prisma.client.findFirst({
+          where: { phone: order.clientPhone },
+          select: { telegramId: true }
+        });
+        if (clientByPhone?.telegramId) {
+          targetTelegramId = clientByPhone.telegramId;
+          if (effectiveChannel === 'NONE') effectiveChannel = 'TELEGRAM';
+        }
+      }
+
+      if (effectiveChannel === 'TELEGRAM' && targetTelegramId && /^\d+$/.test(targetTelegramId)) {
         success = await this.sendTelegram(targetTelegramId, message);
-      } else if (channel === 'WHATSAPP' && order.messengerContact) {
+      } else if (effectiveChannel === 'WHATSAPP' && order.messengerContact) {
         success = await this.sendWhatsApp(order.messengerContact, message, order.orderNumber, newStatus);
       }
 
@@ -176,7 +193,7 @@ class NotificationService {
       await prisma.notificationLog.create({
         data: {
           orderId: order.id,
-          channel: success ? channel : 'NONE',
+          channel: success ? effectiveChannel : 'NONE',
           status: success ? 'sent' : 'failed',
           error: success ? null : (error || 'Failed to send or no valid channel'),
         },

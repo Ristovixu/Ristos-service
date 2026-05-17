@@ -118,7 +118,7 @@ export const requestTelegramSession = async (req: Request, res: Response) => {
       }
     });
 
-    const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'techrepair_bot';
+    const botUsername = process.env.TELEGRAM_BOT_USERNAME || 'pixelfix_bot';
     const botLink = `https://t.me/${botUsername}?start=${token}`;
 
     res.json({ success: true, sessionId: session.id, botLink });

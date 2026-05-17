@@ -87,8 +87,8 @@ export const CabinetNewOrderPage: React.FC = () => {
           name: client?.phone, // Use phone as name for cabinet orders
           phone: client?.phone,
           deliveryMode: formData.deliveryMode === 'dropoff' ? 'SELF_DROPOFF' : 'COURIER',
-          messengerType: 'TELEGRAM',
-          messengerContact: client?.telegramId
+          messengerType: client?.telegramId ? 'TELEGRAM' : 'NONE',
+          messengerContact: client?.telegramId || ''
         }),
       });
       const result = await response.json();

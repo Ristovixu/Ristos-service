@@ -1,3 +1,10 @@
 node_modules/
+dist/
+build/
 .DS_Store
 *.log
+.env
+.env.*
+!.env.example
+*_prompt.md
+design_overhaul_claude_opus.md

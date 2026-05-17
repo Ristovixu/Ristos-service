@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Phone, MessageCircle, Send } from 'lucide-react';
 
-const TELEGRAM_USER = import.meta.env.VITE_CONTACT_TELEGRAM || 'techrepair_support';
+const TELEGRAM_USER = import.meta.env.VITE_CONTACT_TELEGRAM || 'pixelfix_support';
 const WHATSAPP_PHONE = import.meta.env.VITE_CONTACT_WHATSAPP || '79990000000';
 const CONTACT_PHONE = import.meta.env.VITE_CONTACT_PHONE || '+7 (999) 000-00-00';
 

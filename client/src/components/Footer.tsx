@@ -11,7 +11,7 @@ export const Footer = () => {
           <div className="md:col-span-5">
             <Link to="/" className="inline-block mb-6">
               <span className="font-display text-[22px] font-semibold text-[var(--c-ink)] tracking-tight">
-                TechRepair
+                PixelFix
               </span>
             </Link>
             <p className="text-[var(--c-ink-soft)] font-light text-[15px] max-w-sm leading-relaxed">
@@ -54,7 +54,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-[var(--c-ink-soft)] text-[15px] font-light">
                 <Mail className="w-4 h-4 text-[var(--c-accent)] shrink-0" />
-                info@techrepair.ru
+                info@pixelfix.ru
               </li>
             </ul>
           </div>
@@ -62,7 +62,7 @@ export const Footer = () => {
 
         <div className="border-t border-[var(--c-border)] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-[var(--c-ink-ghost)] text-[var(--t-small)]">
-            © {new Date().getFullYear()} TechRepair. Все права защищены.
+            © {new Date().getFullYear()} PixelFix. Все права защищены.
           </p>
           <div className="flex gap-8">
             <Link to="#" className="text-[var(--c-ink-ghost)] hover:text-[var(--c-ink-soft)] text-[var(--t-small)] transition-colors">

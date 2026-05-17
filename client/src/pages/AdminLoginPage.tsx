@@ -57,7 +57,7 @@ export const AdminLoginPage: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-xl shadow-black/5 border border-[#E5E7EB] p-8 md:p-10">
           <div className="text-center mb-10">
             <h1 className="font-display text-3xl font-bold text-[#111827] mb-2">Вход в админку</h1>
-            <p className="text-[#6B7280]">ТехРемонт Pro — Панель управления</p>
+            <p className="text-[#6B7280]">PixelFix — Панель управления</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
